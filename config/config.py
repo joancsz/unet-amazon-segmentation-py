@@ -1,6 +1,8 @@
+'''Configuration file'''
+
 import os
 from pydantic_settings import BaseSettings
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Union
 from pathlib import Path
 
 class BaseExperimentConfig(BaseSettings):
@@ -13,7 +15,7 @@ class BaseExperimentConfig(BaseSettings):
     val_mask_dir: Path
     test_img_dir: Path
     test_mask_dir: Path
-    experiment_configs: List[Dict[str, Optional[str]]]
+    experiment_configs: List[Dict[str, Optional[Union[Path, str]]]]
 
     class Config:
         # Use environment variables to override these values
@@ -45,10 +47,10 @@ class FirstExperimentConfig(BaseExperimentConfig):
             test_img_dir=data_dir / "Validation/images",
             test_mask_dir=data_dir / "Validation/label",
             experiment_configs=[
-                {"encoder": "resnet18", "decoder_attention": None, "out_dir": model_runs_output / "resnet18"},
-                {"encoder": "resnet34", "decoder_attention": None, "out_dir": model_runs_output / "resnet34"},
-                {"encoder": "efficientnet-b0", "decoder_attention": None, "out_dir": model_runs_output / "efficientnet-b0"},
-                {"encoder": "mobilenet_v2", "decoder_attention": None, "out_dir": model_runs_output / "mobilenet_v2"}
+                {"encoder": "resnet18", "decoder_attention": None, "out_dir": f'{model_runs_output / "resnet18"}'},
+                {"encoder": "resnet34", "decoder_attention": None, "out_dir": f'{model_runs_output / "resnet34"}'},
+                {"encoder": "efficientnet-b0", "decoder_attention": None, "out_dir": f'{model_runs_output / "efficientnet-b0"}'},
+                {"encoder": "mobilenet_v2", "decoder_attention": None, "out_dir": f'{model_runs_output / "mobilenet_v2"}'}
             ]
         )
 
