@@ -1,0 +1,244 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>training.training &mdash; Unet Amazon Segmentation 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Unet Amazon Segmentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">unet-amazon-segmentation-py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Unet Amazon Segmentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">training.training</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for training.training</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.tensorboard</span><span class="w"> </span><span class="kn">import</span> <span class="n">SummaryWriter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">training.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">initialize_metrics</span><span class="p">,</span> <span class="n">log_metrics</span><span class="p">,</span> <span class="n">reset_metrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">model.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_checkpoint</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+
+<div class="viewcode-block" id="run_epoch">
+<a class="viewcode-back" href="../../training.html#training.training.run_epoch">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_epoch</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">loader</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">scaler</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run one epoch of training/validation with proper gradient handling.&quot;&quot;&quot;</span>
+    <span class="n">loss_total</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">loader</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">phase</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2"> Epoch&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Phase-specific context managers</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">set_grad_enabled</span><span class="p">(</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span> <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span> <span class="k">else</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">imgs</span><span class="p">,</span> <span class="n">masks</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="n">imgs</span><span class="p">,</span> <span class="n">masks</span> <span class="o">=</span> <span class="n">imgs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">masks</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Forward pass with automatic mixed precision</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="p">(</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">)):</span>  <span class="c1"># Only enable AMP for training</span>
+            <span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">masks</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+
+        <span class="c1"># Training-specific operations</span>
+        <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>
+            <span class="c1"># Backward pass with gradient scaling</span>
+            <span class="n">scaler</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+            <span class="c1"># Unscale before clipping (CRUCIAL SAFETY STEP)</span>
+            <span class="n">scaler</span><span class="o">.</span><span class="n">unscale_</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+
+            <span class="c1"># Gradient clipping (using unscaled gradients)</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span>
+
+            <span class="c1"># Update weights with scaled gradients</span>
+            <span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+            <span class="n">scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+        <span class="c1"># Validation-specific handling</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Ensure no gradient tracking in eval</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>  <span class="c1"># Explicit safety even though grad is disabled</span>
+                <span class="n">preds_bin</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+        <span class="c1"># Update metrics (safe for both phases)</span>
+        <span class="n">loss_total</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;train&#39;</span><span class="p">:</span>  <span class="c1"># For training, preds_bin needs to be computed without no_grad</span>
+            <span class="n">preds_bin</span> <span class="o">=</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">preds_bin</span><span class="p">,</span> <span class="n">masks</span><span class="o">.</span><span class="n">long</span><span class="p">())</span>
+
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_postfix</span><span class="p">({</span><span class="s1">&#39;Loss&#39;</span><span class="p">:</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()})</span>
+
+    <span class="c1"># Final metric computation</span>
+    <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">loss_total</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
+    <span class="n">metrics_results</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">metric</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">avg_loss</span><span class="p">,</span> <span class="n">metrics_results</span></div>
+
+
+<div class="viewcode-block" id="train_model">
+<a class="viewcode-back" href="../../training.html#training.training.train_model">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">experiment_tag</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Train the model with early stopping, metric tracking, and checkpointing.&quot;&quot;&quot;</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">(</span><span class="n">comment</span><span class="o">=</span><span class="n">experiment_tag</span><span class="p">)</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="o">.</span><span class="n">device</span>  <span class="c1"># Get device from model</span>
+    <span class="n">best_dice</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">best_model_state</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">patience</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">no_improve</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">epoch_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epoch_val_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">epoch_train_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Initialize metrics for train/val</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="n">initialize_metrics</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+        <span class="s1">&#39;val&#39;</span><span class="p">:</span> <span class="n">initialize_metrics</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">scaler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">GradScaler</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Training Phase</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="n">train_loss</span><span class="p">,</span> <span class="n">train_metrics</span> <span class="o">=</span> <span class="n">run_epoch</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">train_loader</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">scheduler</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">],</span> <span class="n">scaler</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Validation Phase</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">val_loss</span><span class="p">,</span> <span class="n">val_metrics</span> <span class="o">=</span> <span class="n">run_epoch</span><span class="p">(</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">val_loader</span><span class="p">,</span> <span class="n">loss_fn</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">],</span> <span class="n">scaler</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Logging &amp; Checkpointing</span>
+        <span class="n">log_metrics</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">train_loss</span><span class="p">,</span> <span class="n">val_loss</span><span class="p">,</span> <span class="n">train_metrics</span><span class="p">,</span> <span class="n">val_metrics</span><span class="p">)</span>
+        <span class="n">epoch_val_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">val_loss</span><span class="p">,</span> <span class="o">**</span><span class="n">val_metrics</span><span class="p">})</span>
+        <span class="n">epoch_train_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;loss&#39;</span><span class="p">:</span> <span class="n">train_loss</span><span class="p">,</span> <span class="o">**</span><span class="n">train_metrics</span><span class="p">})</span>
+
+        <span class="c1"># Early Stopping &amp; Checkpoint</span>
+        <span class="k">if</span> <span class="n">val_metrics</span><span class="p">[</span><span class="s1">&#39;GeneralizedDice&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">best_dice</span><span class="p">:</span>
+            <span class="n">best_dice</span> <span class="o">=</span> <span class="n">val_metrics</span><span class="p">[</span><span class="s1">&#39;GeneralizedDice&#39;</span><span class="p">]</span>
+            <span class="n">best_model_state</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">())</span>
+            <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">experiment_tag</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">)</span>
+            <span class="n">no_improve</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">no_improve</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">no_improve</span> <span class="o">==</span> <span class="n">patience</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Early stopping at epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+
+        <span class="c1"># Scheduler Step</span>
+        <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
+        <span class="n">epoch_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span>
+        <span class="n">reset_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+    <span class="c1"># Load best model weights</span>
+    <span class="k">if</span> <span class="n">best_model_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">best_model_state</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">,</span>
+        <span class="s2">&quot;best_dice&quot;</span><span class="p">:</span> <span class="n">best_dice</span><span class="p">,</span>
+        <span class="s2">&quot;epoch_times&quot;</span><span class="p">:</span> <span class="n">epoch_times</span><span class="p">,</span>
+        <span class="s2">&quot;total_time&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">epoch_times</span><span class="p">),</span>
+        <span class="s2">&quot;avg_epoch_time&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">epoch_times</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">epoch_times</span><span class="p">),</span>
+        <span class="s2">&quot;epochs_run&quot;</span><span class="p">:</span> <span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;epoch_val_metrics&quot;</span><span class="p">:</span> <span class="n">epoch_val_metrics</span><span class="p">,</span>
+        <span class="s2">&quot;epoch_train_metrics&quot;</span><span class="p">:</span> <span class="n">epoch_train_metrics</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joan Souza.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

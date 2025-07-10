@@ -1,0 +1,226 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>unet-amazon-segmentation-py &mdash; Unet Amazon Segmentation 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=f2a433a1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="config package" href="config.html" />
+    <link rel="prev" title="Unet Amazon Segmentation documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Unet Amazon Segmentation
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">unet-amazon-segmentation-py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html">config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">data package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html">model package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html">evaluation package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="training.html">training package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_image_preprocessing.html">run_image_preprocessing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_first_experiment.html">run_first_experiment module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_second_experiment.html">run_second_experiment module</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Unet Amazon Segmentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">unet-amazon-segmentation-py</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="unet-amazon-segmentation-py">
+<h1>unet-amazon-segmentation-py<a class="headerlink" href="#unet-amazon-segmentation-py" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="config.html">config package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="config.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#module-config.config">config.config module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.Config"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.data_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.data_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.experiment_configs"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.experiment_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.model_config"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.model_runs_output"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.model_runs_output</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.test_img_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.test_img_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.test_mask_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.test_mask_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.train_img_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.train_img_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.train_mask_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.train_mask_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.val_img_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.val_img_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.BaseExperimentConfig.val_mask_dir"><code class="docutils literal notranslate"><span class="pre">BaseExperimentConfig.val_mask_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#config.config.FirstExperimentConfig"><code class="docutils literal notranslate"><span class="pre">FirstExperimentConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.FirstExperimentConfig.model_config"><code class="docutils literal notranslate"><span class="pre">FirstExperimentConfig.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="config.html#config.config.SecondExperimentConfig"><code class="docutils literal notranslate"><span class="pre">SecondExperimentConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="config.html#config.config.SecondExperimentConfig.model_config"><code class="docutils literal notranslate"><span class="pre">SecondExperimentConfig.model_config</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="config.html#module-config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">data package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data.dataset">data.dataset module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.dataset.SatelliteSegmentationDataset"><code class="docutils literal notranslate"><span class="pre">SatelliteSegmentationDataset</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data.preprocessing">data.preprocessing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.clip_prodes"><code class="docutils literal notranslate"><span class="pre">clip_prodes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.convert_forest_to_binary"><code class="docutils literal notranslate"><span class="pre">convert_forest_to_binary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.process_sentinel"><code class="docutils literal notranslate"><span class="pre">process_sentinel()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.process_sentinel_fast"><code class="docutils literal notranslate"><span class="pre">process_sentinel_fast()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.split_dataset"><code class="docutils literal notranslate"><span class="pre">split_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.preprocessing.tile_datasets"><code class="docutils literal notranslate"><span class="pre">tile_datasets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data.transform">data.transform module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.transform.get_transforms"><code class="docutils literal notranslate"><span class="pre">get_transforms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">model package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#module-model.loss">model.loss module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.html#model.loss.DiceBCELoss"><code class="docutils literal notranslate"><span class="pre">DiceBCELoss</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="model.html#model.loss.DiceBCELoss.forward"><code class="docutils literal notranslate"><span class="pre">DiceBCELoss.forward()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#module-model.model">model.model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="model.html#model.model.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="model.html#model.model.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="model.html#module-model">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">evaluation package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html#module-evaluation.evaluation">evaluation.evaluation module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="evaluation.html#evaluation.evaluation.evaluate_model"><code class="docutils literal notranslate"><span class="pre">evaluate_model()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="evaluation.html#evaluation.evaluation.plot_training_curves"><code class="docutils literal notranslate"><span class="pre">plot_training_curves()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="evaluation.html#evaluation.evaluation.visualize_predictions_v2"><code class="docutils literal notranslate"><span class="pre">visualize_predictions_v2()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="evaluation.html#module-evaluation">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="training.html">training package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="training.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="training.html#module-training.experiment">training.experiment module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.experiment.run_experiment"><code class="docutils literal notranslate"><span class="pre">run_experiment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training.html#module-training.metrics">training.metrics module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.metrics.initialize_metrics"><code class="docutils literal notranslate"><span class="pre">initialize_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.metrics.log_metrics"><code class="docutils literal notranslate"><span class="pre">log_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.metrics.reset_metrics"><code class="docutils literal notranslate"><span class="pre">reset_metrics()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training.html#module-training.training">training.training module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.training.run_epoch"><code class="docutils literal notranslate"><span class="pre">run_epoch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="training.html#training.training.train_model"><code class="docutils literal notranslate"><span class="pre">train_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="training.html#module-training">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="run_image_preprocessing.html">run_image_preprocessing module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_first_experiment.html">run_first_experiment module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_second_experiment.html">run_second_experiment module</a></li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Unet Amazon Segmentation documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="config.html" class="btn btn-neutral float-right" title="config package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Joan Souza.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
