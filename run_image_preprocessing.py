@@ -1,4 +1,4 @@
-
+'''Image preprocessing task'''
 import pathlib
 import os
 from data.preprocessing import (
